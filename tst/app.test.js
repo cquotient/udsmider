@@ -29,11 +29,11 @@ describe('handle', function(){
 
   afterEach(function(){
     publish_spy.reset();
+    return rc.delAsync('lock:test_subj', 'messages:test_subj');
   });
 
   after(function(){
     sandbox.restore();
-    return rc.delAsync('lock:test_subj', 'messages:test_subj');
   });
 
   it('should forward the first sns message to the real alarm topic', function(done){
@@ -88,12 +88,15 @@ describe('handle', function(){
       };
       return handlerAsync(fake_sns_event2, {});
     }).then(function(){
-      // expect(publish_spy.calledOnce).to.be.true;
+      expect(publish_spy.calledOnce).to.be.true;
       expect(publish_spy.args[0][0]).to.eql({
         Message: ['test msg 2', 'test msg 1'].join('\n'),
         Subject: 'test_subj',
         TopicArn: 'mt_test_arn'
       });
+      return rc.lrangeAsync('messages:test_subj', 0, -1);
+    }).then(function(messages){
+      expect(messages).to.be.null;
     });
   });
 
