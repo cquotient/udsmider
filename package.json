@@ -1,0 +1,29 @@
+{
+  "name": "udsmider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha --recursive tst"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cquotient/udsmider.git"
+  },
+  "author": "CQ Engineering",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cquotient/udsmider/issues"
+  },
+  "homepage": "https://github.com/cquotient/udsmider#readme",
+  "dependencies": {
+    "aws-sdk": "2.41.0",
+    "bluebird": "^3.5.0",
+    "redis": "^2.7.1"
+  },
+  "devDependencies": {
+    "chai": "3.5.0",
+    "mocha": "3.2.0",
+    "sinon": "2.1.0"
+  }
+}
