@@ -96,7 +96,7 @@ describe('handle', function(){
       });
       return rc.lrangeAsync('messages:test_subj', 0, -1);
     }).then(function(messages){
-      expect(messages).to.be.null;
+      expect(messages).to.have.length(0);
     });
   });
 

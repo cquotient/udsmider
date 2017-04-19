@@ -24,14 +24,17 @@ function _handler(event, context, callback) {
   .then(function(result){
     let msg_list_key = _gen_msg_list_key(sns_obj.Subject);
     if(result === 'OK') {
-      return rc.lrangeAsync(msg_list_key, 0, -1).then(function(messages){
-        let message = [sns_obj.Message].concat(messages).join('\n');
-        SNS.publish({
-          Message: message,
-          Subject: sns_obj.Subject,
-          TopicArn: process.env.TARGET_SNS_TOPIC_ARN
-        }, callback);
-      });
+      return rc.multi()
+        .lrange(msg_list_key, 0, -1)
+        .del(msg_list_key)
+        .exec(function(err, replies){
+          let message = [sns_obj.Message].concat(replies[0]).join('\n');
+          SNS.publish({
+            Message: message,
+            Subject: sns_obj.Subject,
+            TopicArn: process.env.TARGET_SNS_TOPIC_ARN
+          }, callback);
+        });
     } else {
       rc.rpush(msg_list_key, sns_obj.Message);
       callback();
