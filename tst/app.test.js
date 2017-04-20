@@ -29,7 +29,7 @@ describe('handle', function(){
 
   afterEach(function(){
     publish_spy.reset();
-    return rc.delAsync('lock:test_subj', 'messages:test_subj');
+    return rc.delAsync('lock:test_subj', 'messages:test_subj', 'messages:test_subj_cw');
   });
 
   after(function(){
@@ -37,6 +37,7 @@ describe('handle', function(){
   });
 
   describe('sns events', function(){
+
     it('should forward the first sns message to the real alarm topic', function(done){
       let fake_sns_event = {
         Records: [
@@ -100,6 +101,25 @@ describe('handle', function(){
         expect(messages).to.have.length(0);
       });
     });
+
+  });
+
+  describe.skip('coudwatch events', function(){
+
+    it('should clean up any messages in the queue', function(){
+      return rc.rpushAsync('messages:test_subj_cw', 'leftover 1', 'leftover 2')
+      .then(function(){
+        return handlerAsync({}, {});
+      }).then(function(){
+        expect(publish_spy.calledOnce).to.be.true;
+        expect(publish_spy.args[0][0]).to.eql({
+          Message: ['leftover 2', 'leftover 1'].join('\n'),
+          Subject: 'test_subj_cw',
+          TopicArn: 'mt_test_arn'
+        });
+      });
+    });
+
   });
 
 });
