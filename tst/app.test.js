@@ -38,7 +38,7 @@ describe('handle', function(){
 
   describe('sns events', function(){
 
-    it('should forward the first sns message to the real alarm topic', function(done){
+    it('should forward the first sns message to the real alarm topic', function(){
       let fake_sns_event = {
         Records: [
           {
@@ -49,13 +49,13 @@ describe('handle', function(){
           }
         ]
       }
-      handler(fake_sns_event, {}, function(err){
+      return handlerAsync(fake_sns_event, {})
+      .then(function(){
         expect(publish_spy.args[0][0]).to.eql({
           Message: 'test msg',
           Subject: 'test_subj',
           TopicArn: 'mt_test_arn'
         });
-        done(err);
       });
     });
 
@@ -104,13 +104,12 @@ describe('handle', function(){
 
   });
 
-  describe.skip('coudwatch events', function(){
+  describe('coudwatch events', function(){
 
     it('should clean up any messages in the queue', function(){
-      return rc.rpushAsync('messages:test_subj_cw', 'leftover 1', 'leftover 2')
+      return rc.rpushAsync('messages:test_subj_cw', 'leftover 2', 'leftover 1')
+      .then(() => handlerAsync({}, {}))
       .then(function(){
-        return handlerAsync({}, {});
-      }).then(function(){
         expect(publish_spy.calledOnce).to.be.true;
         expect(publish_spy.args[0][0]).to.eql({
           Message: ['leftover 2', 'leftover 1'].join('\n'),
