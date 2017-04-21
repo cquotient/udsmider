@@ -55,7 +55,7 @@ function _check_leftovers(target_topic_arn) {
       .forEach(function(key_parts){
         if(key_parts[0] === 'lock') {
           lock_subjs.push(key_parts[1]);
-        } else {
+        } else if(key_parts[0] === 'messages'){
           message_subjs.push(key_parts[1]);
         }
       });
