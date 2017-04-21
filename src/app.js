@@ -46,6 +46,12 @@ function _debounce_sns(subject, message, target_topic_arn, debounce_time_s) {
 }
 
 function _check_leftovers(target_topic_arn) {
+  /*
+    i know what you're thinking, this seems kind of crazy. keep in mind that there
+    should pretty much always be very few keys in this redis instance, and it should
+    not be serving any traffic. there are other ways to accomplish this, but this
+    seemed like the simplest way
+  */
   return rc.keysAsync('*')
   .then(function(keys){
     let lock_subjs = [],
