@@ -16,7 +16,7 @@ describe('handle', function(){
     sandbox = require('sinon').sandbox.create();
     let AWS = require('aws-sdk');
     let mock_sns = {
-      publish: (params, cb) => {!!cb && cb()}
+      publish: (params, cb) => {cb && cb()}
     };
     publish_spy = sandbox.spy(mock_sns, 'publish');
     sandbox.stub(AWS, 'SNS').callsFake(() => mock_sns);
