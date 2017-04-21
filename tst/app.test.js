@@ -105,6 +105,8 @@ describe('handle', function(){
   });
 
   describe('coudwatch events', function(){
+    // sample cloudwatch event: http://docs.aws.amazon.com/lambda/latest/dg/eventsources.html#eventsources-scheduled-event
+    // basically, there is no important data in the event for us to use
 
     it('should clean up any messages in the queue', function(){
       return rc.rpushAsync('messages:test_subj_cw', 'leftover 2', 'leftover 1')
