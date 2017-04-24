@@ -84,9 +84,13 @@ function _handler(event, context, callback) {
   rc = BB.promisifyAll(redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST));
   if(event.Records && event.Records[0] && event.Records[0].Sns) {
     let sns_obj = event.Records[0].Sns;
-    _debounce_sns(sns_obj.Subject, sns_obj.Message, process.env.TARGET_SNS_TOPIC_ARN, DEBOUNCE_TIME_S).then(() => _cleanup(callback)).catch(callback);
+    _debounce_sns(sns_obj.Subject, sns_obj.Message, process.env.TARGET_SNS_TOPIC_ARN, DEBOUNCE_TIME_S).then((function(){
+      _cleanup(callback);
+    })).catch(callback);
   } else {
-    _check_leftovers(process.env.TARGET_SNS_TOPIC_ARN).then(() => _cleanup(callback)).catch(callback);
+    _check_leftovers(process.env.TARGET_SNS_TOPIC_ARN).then(function(){
+      _cleanup(callback);
+    }).catch(callback);
   }
 }
 
