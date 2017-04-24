@@ -5,7 +5,7 @@ const AWS = require('aws-sdk');
 const SNS = BB.promisifyAll(new AWS.SNS({apiVersion: '2010-03-31'}));
 const redis = require('redis');
 
-const rc = BB.promisifyAll(redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST));
+let rc;
 
 const DEBOUNCE_TIME_S = 300; //5 minutes per message forwarded
 
@@ -75,12 +75,18 @@ function _check_leftovers(target_topic_arn) {
   })
 }
 
+function _cleanup(cb) {
+  rc.end(true);
+  cb();
+}
+
 function _handler(event, context, callback) {
+  rc = BB.promisifyAll(redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST));
   if(event.Records && event.Records[0] && event.Records[0].Sns) {
     let sns_obj = event.Records[0].Sns;
-    _debounce_sns(sns_obj.Subject, sns_obj.Message, process.env.TARGET_SNS_TOPIC_ARN, DEBOUNCE_TIME_S).then(() => callback()).catch(callback);
+    _debounce_sns(sns_obj.Subject, sns_obj.Message, process.env.TARGET_SNS_TOPIC_ARN, DEBOUNCE_TIME_S).then(() => _cleanup(callback)).catch(callback);
   } else {
-    _check_leftovers(process.env.TARGET_SNS_TOPIC_ARN).then(() => callback()).catch(callback);
+    _check_leftovers(process.env.TARGET_SNS_TOPIC_ARN).then(() => _cleanup(callback)).catch(callback);
   }
 }
 
