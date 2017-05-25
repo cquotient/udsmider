@@ -239,8 +239,8 @@ Resources:
     DependsOn: udsmiderLambdaIAMPolicy
     Properties:
       Code:
-        S3Bucket: cqmt
-        S3Key: udsmider.zip
+        S3Bucket: cq-os-us-east-1
+        S3Key: udsmider/udsmider.zip
       Handler: index.handler
       Role:
         Fn::GetAtt: [ udsmiderLambdaIAMRole, Arn ]
