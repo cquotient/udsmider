@@ -82,7 +82,7 @@ function _check_leftovers(rc, target_topic_arn) {
 }
 
 function _cleanup(err, rc, cb) {
-  rc.end(true);
+  rc.quit();
   rc.on('end', () => cb(err));
 }
 

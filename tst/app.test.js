@@ -2,8 +2,7 @@
 
 describe('handle', function(){
 
-  let handler,
-      handlerAsync,
+  let handlerAsync,
       rc,
       sandbox,
       expect,
@@ -22,7 +21,7 @@ describe('handle', function(){
     sandbox.stub(AWS, 'SNS').callsFake(() => mock_sns);
     expect = require('chai').expect;
     let BB = require('bluebird');
-    handler = require('../src/app.js').handler;
+    let handler = require('../src/app.js').handler;
     handlerAsync = BB.promisify(handler);
     rc = BB.promisifyAll(require('redis').createClient());
   });
