@@ -1,0 +1,16 @@
+language: node_js
+node_js: '6.10'
+sudo: false
+services:
+  - redis-server
+branches:
+  only: master
+deploy:
+  - provider: s3
+    bucket: cq-os-us-east-1
+    local-dir: _build_to_deploy
+    upload-dir: udsmider
+    on:
+      repo: cquotient/udsmider
+      branch: master
+    skip_cleanup: true
