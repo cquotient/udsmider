@@ -1,9 +1,10 @@
 # udsmider
 udsmider is an SNS debouncing tool to prevent a distributed system from flooding another system with alarm notifications. There are a few components:
 1) A 'source' SNS topic - this is the topic that your code should send notifications to that you want to be alerted of.
-2) A Lambda function to intercept the source notifications and decide whether or not to actually send a notification intendted for a human, based on the subject of the SNS notifications.
+2) A Lambda function to intercept the source notifications and decide whether or not to actually send a notification intended for a human, based on the subject of the SNS notifications.
 3) An ElastiCache redis backend to keep track of messages that have been debounced.
-4) A cloudformation template to easily deploy all the pieces necessary for this to work in AWS.
+4) A 'target' SNS topic - this is the topic that udsmider will forward aggregated notifications to.
+5) A Cloudformation template to easily deploy all the pieces necessary for this to work in AWS.
 
 ## Getting started
 It is easy to get started:
