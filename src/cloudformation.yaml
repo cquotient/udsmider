@@ -257,3 +257,29 @@ Resources:
           REDIS_PORT: 6379
           TARGET_SNS_TOPIC_ARN:
             Ref: TargetSNSTopicParam
+      Timeout: 10
+
+  udsmiderSourceSNSTopic:
+    Type: AWS::SNS::Topic
+    DependsOn: udsmiderLambda
+    Properties:
+      Subscription:
+        - Endpoint:
+            Fn::GetAtt: [ udsmiderLambda, Arn ]
+          Protocol: lambda
+
+  udsmiderSNSLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: sns.amazonaws.com
+      SourceArn:
+        Ref: udsmiderSourceSNSTopic
+      FunctionName:
+        Ref: udsmiderLambda
+
+Outputs:
+  SourceSNSTopic:
+    Description: Send alarm notifications to this SNS topic to debounce them. The debounced alarms will be forwarded to the given target SNS topic passed in TargetSNSTopicParam.
+    Value:
+      Ref: udsmiderSourceSNSTopic
