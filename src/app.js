@@ -83,7 +83,7 @@ function _check_leftovers(rc, target_topic_arn) {
 
 function _cleanup(err, rc, cb) {
   rc.end(true);
-  cb(err);
+  rc.on('end', () => cb(err));
 }
 
 function _handler(event, context, callback) {
