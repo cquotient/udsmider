@@ -5,6 +5,9 @@ services:
   - redis-server
 branches:
   only: master
+before_deploy:
+  - mkdir _build_to_deploy
+  - rm -rf node_modules && npm i --production && zip -r _build_to_deploy/udsmider.zip index.js package.json node_modules src
 deploy:
   - provider: s3
     bucket: cq-os-us-east-1

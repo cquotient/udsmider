@@ -28,5 +28,3 @@ aws sns publish --topic-arn arn:aws:sns:us-east-1:117684984046:mt-test4-udsmider
 ```
 
 udsmider uses the subject of the messages to debounce, so you should get one notification immediately with 'this is a test message', and then one more notification a few minutes later with the second two messages.
-
-`rm -rf node_modules && npm i --production && zip -r udsmider.zip index.js package.json node_modules src`
