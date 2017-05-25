@@ -278,6 +278,28 @@ Resources:
       FunctionName:
         Ref: udsmiderLambda
 
+  udsmiderCleanupCloudwatchEvent:
+    Type: AWS::Events::Rule
+    DependsOn: udsmiderLambda
+    Properties:
+      State: ENABLED
+      Description: This is a cron job to clean up debounced messages
+      ScheduleExpression: rate(5 minutes)
+      Targets:
+        - Arn:
+            Fn::GetAtt: [ udsmiderLambda, Arn ]
+          Id: udsmider-cleanup-event
+
+  udsmiderCleanupPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: udsmiderLambda
+      Action: 'lambda:InvokeFunction'
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt: [ udsmiderCleanupCloudwatchEvent, Arn ]
+
 Outputs:
   SourceSNSTopic:
     Description: Send alarm notifications to this SNS topic to debounce them. The debounced alarms will be forwarded to the given target SNS topic passed in TargetSNSTopicParam.
