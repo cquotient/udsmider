@@ -9,7 +9,7 @@ udsmider is an SNS debouncing tool to prevent a distributed system from flooding
 ## Getting started
 It is easy to get started:
 ```
-aws cloudformation create-stack --region us-east-1 --template-body "`cat src/cloudformation.yaml`" --parameters ParameterKey=TargetSNSTopicParam,ParameterValue={sns_arn} --capabilities CAPABILITY_IAM --stack-name udsmider-test
+aws cloudformation create-stack --region us-east-1 --template-body "`cat src/cloudformation.yml`" --parameters ParameterKey=TargetSNSTopicParam,ParameterValue={sns_arn} --capabilities CAPABILITY_IAM --stack-name udsmider-test
 ```
 where {sns_arn} is an SNS topic you already have that has a subscription set up for you to see (for example, an email address that you receive alarms on).
 
