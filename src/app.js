@@ -24,7 +24,12 @@ function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arn) {
   return multi.execAsync()
     .then(function(replies){
       console.log(`got redis response: ${JSON.stringify(replies)}`);
-      let aggregated_message = replies[0].map((sns_msg_as_text) => JSON.parse(sns_msg_as_text)).concat(curr_msgs).map((sns_msg_objs) => sns_msg_objs.Message).join('\n');
+      let aggregated_message =
+        replies[0]
+        .map((sns_msg_as_text) => JSON.parse(sns_msg_as_text))
+        .concat(curr_msgs)
+        .map((sns_msg_objs, idx) => `Message ${idx+1}: ${sns_msg_objs.Message}`)
+        .join('\n--------------');
       return SNS.publishAsync({
         Message: aggregated_message,
         Subject: subject,

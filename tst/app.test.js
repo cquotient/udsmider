@@ -51,7 +51,7 @@ describe('handle', function(){
       return handlerAsync(fake_sns_event, {})
       .then(function(){
         expect(publish_spy.args[0][0]).to.eql({
-          Message: 'test msg',
+          Message: 'Message 1: test msg',
           Subject: 'test_subj',
           TopicArn: 'mt_test_arn'
         });
@@ -91,7 +91,7 @@ describe('handle', function(){
       }).then(function(){
         expect(publish_spy.calledOnce).to.be.true;
         expect(publish_spy.args[0][0]).to.eql({
-          Message: ['test msg 1', 'test msg 2'].join('\n'),
+          Message: ['Message 1: test msg 1', 'Message 2: test msg 2'].join('\n--------------'),
           Subject: 'test_subj',
           TopicArn: 'mt_test_arn'
         });
@@ -123,7 +123,7 @@ describe('handle', function(){
       .then(function(){
         expect(publish_spy.calledOnce).to.be.true;
         expect(publish_spy.args[0][0]).to.eql({
-          Message: ['leftover 2', 'leftover 1'].join('\n'),
+          Message: ['Message 1: leftover 2', 'Message 2: leftover 1'].join('\n--------------'),
           Subject: 'test_subj_cw',
           TopicArn: 'mt_test_arn'
         });
