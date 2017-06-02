@@ -91,7 +91,7 @@ describe('handle', function(){
       }).then(function(){
         expect(publish_spy.calledOnce).to.be.true;
         expect(publish_spy.args[0][0]).to.eql({
-          Message: ['test msg 2', 'test msg 1'].join('\n'),
+          Message: ['test msg 1', 'test msg 2'].join('\n'),
           Subject: 'test_subj',
           TopicArn: 'mt_test_arn'
         });
@@ -108,7 +108,17 @@ describe('handle', function(){
     // basically, there is no important data in the event for us to use
 
     it('should clean up any messages in the queue', function(){
-      return rc.rpushAsync('messages:test_subj_cw', 'leftover 2', 'leftover 1')
+      let leftovers = [
+        JSON.stringify({
+          Subject: 'test_subj_cw',
+          Message: 'leftover 2'
+        }),
+        JSON.stringify({
+          Subject: 'test_subj_cw',
+          Message: 'leftover 1'
+        })
+      ];
+      return rc.rpushAsync('messages:test_subj_cw', leftovers[0], leftovers[1])
       .then(() => handlerAsync({}, {}))
       .then(function(){
         expect(publish_spy.calledOnce).to.be.true;
