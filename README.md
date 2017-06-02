@@ -28,3 +28,10 @@ aws sns publish --topic-arn arn:aws:sns:us-east-1:117684984046:mt-test4-udsmider
 ```
 
 udsmider uses the subject of the messages to debounce, so you should get one notification immediately with 'this is a test message', and then one more notification a few minutes later with the second two messages.
+
+## Updating code
+To update the code your lambda function runs:
+```
+aws lambda update-function-code --function-name {function_name} --s3-bucket cq-os-us-east-1 --s3-key udsmider/udsmider.zip
+```
+{function_name} should be something like 'udsmider-prod-udsmiderLambda-1EAZZA6B0ALB5'
