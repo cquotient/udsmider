@@ -24,7 +24,12 @@ function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arn) {
   return multi.execAsync()
     .then(function(replies){
       console.log(`got redis response: ${JSON.stringify(replies)}`);
-      let aggregated_message = curr_msgs.concat(replies[0]).join('\n');
+      let aggregated_message =
+        replies[0]
+        .map((sns_msg_as_text) => JSON.parse(sns_msg_as_text))
+        .concat(curr_msgs)
+        .map((sns_msg_obj, idx) => `Message ${idx+1}(${sns_msg_obj.Timestamp}): ${sns_msg_obj.Message}`)
+        .join('\n--------------');
       return SNS.publishAsync({
         Message: aggregated_message,
         Subject: subject,
@@ -37,15 +42,15 @@ function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arn) {
     });
 }
 
-function _debounce_sns(rc, subject, message, target_topic_arn, debounce_time_s) {
-  let lock_key = _gen_lock_key(subject);
+function _debounce_sns(rc, sns_obj, target_topic_arn, debounce_time_s) {
+  let lock_key = _gen_lock_key(sns_obj.Subject);
   return rc.setAsync(lock_key, 1, 'NX', 'EX', debounce_time_s)
   .then(function(result){
     if(result === 'OK') {
-      return _send_aggr_alarm(rc, subject, [message], target_topic_arn);
+      return _send_aggr_alarm(rc, sns_obj.Subject, [sns_obj], target_topic_arn);
     } else {
-      console.log(`debounced: '${message}' with subject: '${subject}'`)
-      return rc.rpushAsync(_gen_msg_list_key(subject), message);
+      console.log(`debounced: '${sns_obj.Message}' with subject: '${sns_obj.Subject}'`)
+      return rc.rpushAsync(_gen_msg_list_key(sns_obj.Subject), JSON.stringify(sns_obj));
     }
   });
 }
@@ -92,7 +97,7 @@ function _handler(event, context, callback) {
   if(event.Records && event.Records[0] && event.Records[0].Sns) {
     let sns_obj = event.Records[0].Sns;
     console.log(`handling sns: ${JSON.stringify(sns_obj)}`);
-    _debounce_sns(rc, sns_obj.Subject, sns_obj.Message, process.env.TARGET_SNS_TOPIC_ARN, DEBOUNCE_TIME_S).then((function(){
+    _debounce_sns(rc, sns_obj, process.env.TARGET_SNS_TOPIC_ARN, DEBOUNCE_TIME_S).then((function(){
       _cleanup(null, rc, callback);
     })).catch(function(err){
       _cleanup(err, rc, callback);
