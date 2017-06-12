@@ -29,7 +29,7 @@ function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arn) {
         .map((sns_msg_as_text) => JSON.parse(sns_msg_as_text))
         .concat(curr_msgs)
         .map((sns_msg_obj, idx) => `Message ${idx+1}(${sns_msg_obj.Timestamp}): ${sns_msg_obj.Message}`)
-        .join('\n--------------');
+        .join('\n--------------\n');
       return SNS.publishAsync({
         Message: aggregated_message,
         Subject: subject,

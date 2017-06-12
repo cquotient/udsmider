@@ -94,7 +94,7 @@ describe('handle', function(){
       }).then(function(){
         expect(publish_spy.calledOnce).to.be.true;
         expect(publish_spy.args[0][0]).to.eql({
-          Message: ['Message 1(1970-01-01T00:00:00.000Z): test msg 1', 'Message 2(1970-01-01T00:00:00.000Z): test msg 2'].join('\n--------------'),
+          Message: ['Message 1(1970-01-01T00:00:00.000Z): test msg 1', 'Message 2(1970-01-01T00:00:00.000Z): test msg 2'].join('\n--------------\n'),
           Subject: 'test_subj',
           TopicArn: 'mt_test_arn'
         });
@@ -128,7 +128,7 @@ describe('handle', function(){
       .then(function(){
         expect(publish_spy.calledOnce).to.be.true;
         expect(publish_spy.args[0][0]).to.eql({
-          Message: ['Message 1(1970-01-01T00:00:00.000Z): leftover 2', 'Message 2(1970-01-01T00:00:00.000Z): leftover 1'].join('\n--------------'),
+          Message: ['Message 1(1970-01-01T00:00:00.000Z): leftover 2', 'Message 2(1970-01-01T00:00:00.000Z): leftover 1'].join('\n--------------\n'),
           Subject: 'test_subj_cw',
           TopicArn: 'mt_test_arn'
         });
