@@ -5,6 +5,17 @@ Parameters:
     Type: String
     Description: Enter the ARN of your target SNS topic to publish debounced alarm notifications to.
 
+Mappings:
+  RegionMap:
+    us-east-1:
+      LambdaCodeBucket: cq-os-us-east-1
+    us-west-2:
+      LambdaCodeBucket: cq-os-us-west-2
+    eu-west-1:
+      LambdaCodeBucket: cq-os-eu-west-1
+    ap-southeast-1:
+      LambdaCodeBucket: cq-os-ap-southeast-1
+
 Resources:
   udsmiderGateway:
     Type: AWS::EC2::InternetGateway
@@ -239,7 +250,11 @@ Resources:
     DependsOn: udsmiderLambdaIAMPolicy
     Properties:
       Code:
-        S3Bucket: cq-os-us-east-1
+        S3Bucket:
+          Fn::FindInMap:
+            - RegionMap
+            - Ref: AWS::Region
+            - LambdaCodeBucket
         S3Key: udsmider/udsmider.zip
       Handler: index.handler
       Role:

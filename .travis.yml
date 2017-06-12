@@ -17,3 +17,27 @@ deploy:
       repo: cquotient/udsmider
       branch: master
     skip_cleanup: true
+  - provider: s3
+    bucket: cq-os-us-west-2
+    local-dir: _build_to_deploy
+    upload-dir: udsmider
+    on:
+      repo: cquotient/udsmider
+      branch: master
+    skip_cleanup: true
+  - provider: s3
+    bucket: cq-os-eu-west-1
+    local-dir: _build_to_deploy
+    upload-dir: udsmider
+    on:
+      repo: cquotient/udsmider
+      branch: master
+    skip_cleanup: true
+  - provider: s3
+    bucket: cq-os-ap-southeast-1
+    local-dir: _build_to_deploy
+    upload-dir: udsmider
+    on:
+      repo: cquotient/udsmider
+      branch: master
+    skip_cleanup: true
