@@ -4,6 +4,7 @@ const BB = require('bluebird');
 const AWS = require('aws-sdk');
 const SNS = BB.promisifyAll(new AWS.SNS({apiVersion: '2010-03-31'}));
 const redis = require('redis');
+const VError = require('verror');
 
 const DEBOUNCE_TIME_S = 300; //5 minutes per message forwarded
 
@@ -38,6 +39,7 @@ function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arn) {
         console.log(`sns response: ${JSON.stringify(resp)}`);
       }).catch(function(err){
         console.log(`sns error: ${JSON.stringify(err)}`);
+        return Promise.reject(new VError(err));
       });
     });
 }
