@@ -7,13 +7,15 @@ const redis = require('redis');
 const VError = require('verror');
 
 const DEBOUNCE_TIME_S = 300; //5 minutes per message forwarded
+const LOCK_KEY_PREFIX = 'lock:';
+const MSG_KEY_PREFIX = 'messages:';
 
 function _gen_lock_key(subj) {
-  return `lock:${subj}`;
+  return `${LOCK_KEY_PREFIX}${subj}`;
 }
 
 function _gen_msg_list_key(subj) {
-  return `messages:${subj}`;
+  return `${MSG_KEY_PREFIX}${subj}`;
 }
 
 function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arn) {
@@ -69,12 +71,11 @@ function _check_leftovers(rc, target_topic_arn) {
     let lock_subjs = [],
         message_subjs = [];
     keys
-      .map((key) => key.split(':'))
-      .forEach(function(key_parts){
-        if(key_parts[0] === 'lock') {
-          lock_subjs.push(key_parts[1]);
-        } else if(key_parts[0] === 'messages'){
-          message_subjs.push(key_parts[1]);
+      .forEach(function(key){
+        if(key.indexOf(LOCK_KEY_PREFIX) === 0) {
+          lock_subjs.push(key.substring(LOCK_KEY_PREFIX.length));
+        } else if(key.indexOf(MSG_KEY_PREFIX) === 0) {
+          message_subjs.push(key.substring(MSG_KEY_PREFIX.length));
         }
       });
     let leftovers = message_subjs.reduce(function(acc, val) {
