@@ -3,7 +3,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   TargetSNSTopicParam:
     Type: String
-    Description: Enter the ARN of your target SNS topic to publish debounced alarm notifications to.
+    Description: Enter the ARNs seperated by pipes, "|", of your target SNS topic to publish debounced alarm notifications to.
 
 Mappings:
   RegionMap:
@@ -270,7 +270,7 @@ Resources:
           REDIS_HOST:
             Fn::GetAtt: [ udsmiderElasticache, RedisEndpoint.Address ]
           REDIS_PORT: 6379
-          TARGET_SNS_TOPIC_ARN:
+          TARGET_SNS_TOPIC_ARNS:
             Ref: TargetSNSTopicParam
       Timeout: 10
 

@@ -18,8 +18,8 @@ function _gen_msg_list_key(subj) {
   return `${MSG_KEY_PREFIX}${subj}`;
 }
 
-function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arn) {
-  console.log(`sending aggregated alarm for '${subject}' to ${target_topic_arn}`);
+function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arns) {
+  console.log(`sending aggregated alarm for '${subject}' to ${target_topic_arns}`);
   let msg_list_key = _gen_msg_list_key(subject);
   let multi = BB.promisifyAll(rc.multi());
   multi.lrangeAsync(msg_list_key, 0, -1);
@@ -33,27 +33,28 @@ function _send_aggr_alarm(rc, subject, curr_msgs, target_topic_arn) {
         .concat(curr_msgs)
         .map((sns_msg_obj, idx) => `Message ${idx+1}(${sns_msg_obj.Timestamp}): ${sns_msg_obj.Message}`)
         .join('\n--------------\n');
-      return SNS.publishAsync({
-        Message: aggregated_message,
-        Subject: subject,
-        TopicArn: target_topic_arn
+      let promises = target_topic_arns.map(arn => SNS.publishAsync({
+          Message: aggregated_message,
+          Subject: subject,
+          TopicArn: arn
       }).then(function(resp){
-        console.log(`sns response: ${JSON.stringify(resp)}`);
+          console.log(`sns response: ${JSON.stringify(resp)}`);
       }).catch(function(err){
-        console.log(`sns error: ${JSON.stringify(err)}`);
-        return Promise.reject(new VError(err));
-      });
+          console.log(`sns error: ${JSON.stringify(err)}`);
+          return Promise.reject(new VError(err));
+      }));
+      return Promise.all(promises);
     });
 }
 
-function _debounce_sns(rc, sns_obj, target_topic_arn, debounce_time_s) {
+function _debounce_sns(rc, sns_obj, target_topic_arns, debounce_time_s) {
   let lock_key = _gen_lock_key(sns_obj.Subject);
   return rc.setAsync(lock_key, 1, 'NX', 'EX', debounce_time_s)
   .then(function(result){
     if(result === 'OK') {
-      return _send_aggr_alarm(rc, sns_obj.Subject, [sns_obj], target_topic_arn);
+      return _send_aggr_alarm(rc, sns_obj.Subject, [sns_obj], target_topic_arns);
     } else {
-      console.log(`debounced: '${sns_obj.Message}' with subject: '${sns_obj.Subject}'`)
+      console.log(`debounced: '${sns_obj.Message}' with subject: '${sns_obj.Subject}'`);
       return rc.rpushAsync(_gen_msg_list_key(sns_obj.Subject), JSON.stringify(sns_obj));
     }
   });
@@ -95,19 +96,20 @@ function _cleanup(err, rc, cb) {
 }
 
 function _handler(event, context, callback) {
-  let rc = BB.promisifyAll(redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST));
-  console.log(`debouncing with: ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)
+  let rc = BB.promisifyAll(redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST)),
+      targets = process.env.TARGET_SNS_TOPIC_ARNS.split('|');
+  console.log(`debouncing with: ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`);
   if(event.Records && event.Records[0] && event.Records[0].Sns) {
     let sns_obj = event.Records[0].Sns;
     console.log(`handling sns: ${JSON.stringify(sns_obj)}`);
-    _debounce_sns(rc, sns_obj, process.env.TARGET_SNS_TOPIC_ARN, DEBOUNCE_TIME_S).then((function(){
+    _debounce_sns(rc, sns_obj, targets, DEBOUNCE_TIME_S).then((function(){
       _cleanup(null, rc, callback);
     })).catch(function(err){
       _cleanup(err, rc, callback);
     });
   } else {
     console.log(`handling cloudwatch event`);
-    _check_leftovers(rc, process.env.TARGET_SNS_TOPIC_ARN).then(function(){
+    _check_leftovers(rc, targets).then(function(){
       _cleanup(null, rc, callback);
     }).catch(function(err){
       _cleanup(err, rc, callback);
