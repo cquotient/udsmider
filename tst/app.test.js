@@ -9,7 +9,7 @@ describe('handle', function(){
       publish_spy;
 
   before(function(){
-    process.env.TARGET_SNS_TOPIC_ARN = 'mt_test_arn';
+    process.env.TARGET_SNS_TOPIC_ARNS = 'mt_test_arn|mgf_test_arn';
     process.env.REDIS_PORT = '6379';
     process.env.REDIS_HOST = '127.0.0.1';
     sandbox = require('sinon').sandbox.create();
@@ -48,7 +48,7 @@ describe('handle', function(){
             }
           }
         ]
-      }
+      };
       return handlerAsync(fake_sns_event, {})
       .then(function(){
         expect(publish_spy.args[0][0]).to.eql({
@@ -92,11 +92,16 @@ describe('handle', function(){
         };
         return handlerAsync(fake_sns_event2, {});
       }).then(function(){
-        expect(publish_spy.calledOnce).to.be.true;
+        expect(publish_spy.callCount).to.eql(2);
         expect(publish_spy.args[0][0]).to.eql({
           Message: ['Message 1(1970-01-01T00:00:00.000Z): test msg 1', 'Message 2(1970-01-01T00:00:00.000Z): test msg 2'].join('\n--------------\n'),
           Subject: 'test_subj',
           TopicArn: 'mt_test_arn'
+        });
+        expect(publish_spy.args[1][0]).to.eql({
+            Message: ['Message 1(1970-01-01T00:00:00.000Z): test msg 1', 'Message 2(1970-01-01T00:00:00.000Z): test msg 2'].join('\n--------------\n'),
+            Subject: 'test_subj',
+            TopicArn: 'mgf_test_arn'
         });
         return rc.lrangeAsync('messages:test_subj', 0, -1);
       }).then(function(messages){
@@ -126,11 +131,16 @@ describe('handle', function(){
       return rc.rpushAsync('messages:test_subj_cw', leftovers[0], leftovers[1])
       .then(() => handlerAsync({}, {}))
       .then(function(){
-        expect(publish_spy.calledOnce).to.be.true;
+        expect(publish_spy.callCount).to.eql(2);
         expect(publish_spy.args[0][0]).to.eql({
           Message: ['Message 1(1970-01-01T00:00:00.000Z): leftover 2', 'Message 2(1970-01-01T00:00:00.000Z): leftover 1'].join('\n--------------\n'),
           Subject: 'test_subj_cw',
           TopicArn: 'mt_test_arn'
+        });
+        expect(publish_spy.args[1][0]).to.eql({
+            Message: ['Message 1(1970-01-01T00:00:00.000Z): leftover 2', 'Message 2(1970-01-01T00:00:00.000Z): leftover 1'].join('\n--------------\n'),
+            Subject: 'test_subj_cw',
+            TopicArn: 'mgf_test_arn'
         });
       });
     });
