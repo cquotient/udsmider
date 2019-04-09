@@ -259,7 +259,7 @@ Resources:
       Handler: index.handler
       Role:
         Fn::GetAtt: [ udsmiderLambdaIAMRole, Arn ]
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       VpcConfig:
         SecurityGroupIds:
           - Ref: udsmiderSecurityGroupLambda
