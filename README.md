@@ -27,6 +27,13 @@ aws sns publish --topic-arn arn:aws:sns:us-east-1:117684984046:mt-test4-udsmider
 aws sns publish --topic-arn arn:aws:sns:us-east-1:117684984046:mt-test4-udsmiderSourceSNSTopic-A1Q5PTGEYN6N --message "this is yet another test message" --subject test_subject
 ```
 
+## Updating CloudFormation stack
+To update resources defined in the CloudFormation template:
+
+```
+aws cloudformation update-stack --region us-east-1 --template-body "`cat src/cloudformation.yml`" --capabilities CAPABILITY_IAM --stack-name udsmider-prod
+```
+
 udsmider uses the subject of the messages to debounce, so you should get one notification immediately with 'this is a test message', and then one more notification a few minutes later with the second two messages.
 
 ## Updating code
