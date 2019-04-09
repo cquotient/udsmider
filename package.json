@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --recursive tst"
+    "test": "./node_modules/mocha/bin/mocha --exit --recursive tst"
   },
   "repository": {
     "type": "git",
