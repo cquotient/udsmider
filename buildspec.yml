@@ -1,0 +1,24 @@
+version: 0.2
+
+phases: 
+  pre_build:
+    commands:
+      - echo Entered the pre_build phase...
+      - docker run -d -p 6379:6379 --name redis redis:5.0.0-alpine
+      - npm install
+  build:
+    commands:
+      - echo Entered the build phase...
+      - npm test
+  post_build:
+    commands:
+      - echo Entered the post_build phase...
+      - mkdir -p _build_to_deploy
+      - rm -rf node_modules
+      - npm i --production
+      - zip -r _build_to_deploy/udsmider.zip index.js package.json node_modules src
+      - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-us-east-1/udsmider/
+      - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-us-west-2/udsmider/
+      - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-eu-west-1/udsmider/
+      - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-ap-southeast-1/udsmider/
+      - echo Uploaded artifacts

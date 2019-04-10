@@ -1,3 +1,4 @@
+![CodeBuild](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiclkxNjJhcUFSZG5LSVlmSHdkSndkeUk0bVllSVBxc0VLOUJIbURmZTZiUEhyR015V3pwTnlIeUd6R3hORFFTUmU0QjM4TDgxRjByL1cvem1SN3dTV2JZPSIsIml2UGFyYW1ldGVyU3BlYyI6Ii9SVmdwckhZNGQrNk9NTVciLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
 # udsmider
 udsmider is an SNS debouncing tool to prevent a distributed system from flooding another system with alarm notifications. There are a few components:
 1) A 'source' SNS topic - this is the topic that your code should send notifications to that you want to be alerted of.
