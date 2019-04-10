@@ -27,3 +27,4 @@ phases:
       - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-us-west-2/udsmider/
       - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-eu-west-1/udsmider/
       - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-ap-southeast-1/udsmider/
+      - echo Uploaded artifacts
