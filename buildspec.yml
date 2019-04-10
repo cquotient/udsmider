@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Entered the pre_build phase...
-      - docker run -d -p 6379:6379 --name redis redis:4.0.6-alpine
+      - docker run -d -p 6379:6379 --name redis redis:5.0.0-alpine
       - mkdir ~/.ssh || echo "SSH dir already exists"
       - aws s3 cp s3://cq-aws-builds/ssh/codebuild_rsa.enc .
       - aws kms decrypt  --region "us-east-1"  --ciphertext-blob "fileb://codebuild_rsa.enc" --output text --query Plaintext | base64 --decode > ~/.ssh/codebuild_rsa
@@ -26,13 +26,4 @@ phases:
 artifacts:
   files:
     - _build_to_deploy/udsmider.zip
-  secondary-artifacts:
-    usw2:
-      files:
-        - _build_to_deploy/udsmider.zip
-    euw1:
-      files:
-        - _build_to_deploy/udsmider.zip
-    apse1:
-      files:
-        - _build_to_deploy/udsmider.zip
+  discard-paths: yes
