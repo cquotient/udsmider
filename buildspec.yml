@@ -15,7 +15,6 @@ phases:
   build:
     commands:
       - echo Entered the build phase...
-      - npm audit
       - npm test
   post_build:
     commands:
