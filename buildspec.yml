@@ -23,7 +23,7 @@ phases:
       - rm -rf node_modules
       - npm i --production
       - zip -r _build_to_deploy/udsmider.zip index.js package.json node_modules src
-artifacts:
-  files:
-    - _build_to_deploy/udsmider.zip
-  discard-paths: yes
+      - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-us-east-1/udsmider/
+      - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-us-west-2/udsmider/
+      - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-eu-west-1/udsmider/
+      - aws s3 cp _build_to_deploy/udsmider.zip s3://cq-os-ap-southeast-1/udsmider/
