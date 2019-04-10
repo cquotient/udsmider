@@ -1,0 +1,26 @@
+version: 0.2
+
+phases: 
+  pre_build:
+    commands:
+      - echo Entered the pre_build phase...
+      - docker run -d -p 6379:6379 --name redis redis:4.0.6-alpine
+      - mkdir ~/.ssh || echo "SSH dir already exists"
+      - aws s3 cp s3://cq-aws-builds/ssh/codebuild_rsa.enc .
+      - aws kms decrypt  --region "us-east-1"  --ciphertext-blob "fileb://codebuild_rsa.enc" --output text --query Plaintext | base64 --decode > ~/.ssh/codebuild_rsa
+      - chmod 500 ~/.ssh/codebuild_rsa
+      - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      - aws s3 cp s3://cq-aws-builds/ssh/ssh_config ~/.ssh/config 
+      - npm install
+  build:
+    commands:
+      - echo Entered the build phase...
+      - npm audit
+      - npm test
+  post_build:
+    commands:
+      - echo Entered the post_build phase...
+      - mkdir -p _build_to_deploy
+      - rm -rf node_modules
+      - npm i --production
+      - zip -r _build_to_deploy/udsmider.zip index.js package.json node_modules src
