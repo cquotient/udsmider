@@ -23,17 +23,16 @@ phases:
       - rm -rf node_modules
       - npm i --production
       - zip -r _build_to_deploy/udsmider.zip index.js package.json node_modules src
-  artifacts:
-    secondary-artifacts:
-      artifact1:
-        files:
-          - _build_to_deploy/udsmider.zip       
-      artifact2:
-        files:
-          - _build_to_deploy/udsmider.zip
-      artifact3:
-        files:
-          - _build_to_deploy/udsmider.zip
-      artifact4:
-        files:
-          - _build_to_deploy/udsmider.zip
+artifacts:
+  files:
+    - _build_to_deploy/udsmider.zip
+  secondary-artifacts:
+    usw2:
+      files:
+        - _build_to_deploy/udsmider.zip
+    euw1:
+      files:
+        - _build_to_deploy/udsmider.zip
+    apse1:
+      files:
+        - _build_to_deploy/udsmider.zip
