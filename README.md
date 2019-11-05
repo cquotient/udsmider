@@ -8,16 +8,7 @@ udsmider is an SNS debouncing tool to prevent a distributed system from flooding
 5) A Cloudformation template to easily deploy all the pieces necessary for this to work in AWS.
 
 ## Getting started
-It is easy to get started:
-```
-aws cloudformation create-stack --region us-east-1 --template-body "`cat src/cloudformation.yml`" --parameters ParameterKey=TargetSNSTopicParam,ParameterValue={sns_arn} --capabilities CAPABILITY_IAM --stack-name udsmider-test
-```
-where {sns_arn} is an SNS topic you already have that has a subscription set up for you to see (for example, an email address that you receive alarms on).
-
-Once the stack is created, you can test by getting the source SNS topic from the stack output:
-```
-aws cloudformation describe-stacks --stack-name udsmider-test
-```
+Add your new one to the terraform files at https://github.com/cquotient/Automation/tree/master/production/services/udsmider and run the apply for applicable regions.
 
 Then publish a few messages to the SNS topic:
 ```
@@ -27,15 +18,6 @@ aws sns publish --topic-arn arn:aws:sns:us-east-1:117684984046:mt-test4-udsmider
 
 aws sns publish --topic-arn arn:aws:sns:us-east-1:117684984046:mt-test4-udsmiderSourceSNSTopic-A1Q5PTGEYN6N --message "this is yet another test message" --subject test_subject
 ```
-
-## Updating CloudFormation stack
-To update resources defined in the CloudFormation template:
-
-```
-aws cloudformation update-stack --region us-east-1 --template-body "`cat src/cloudformation.yml`" --capabilities CAPABILITY_IAM --stack-name udsmider-prod
-```
-
-udsmider uses the subject of the messages to debounce, so you should get one notification immediately with 'this is a test message', and then one more notification a few minutes later with the second two messages.
 
 ## Updating code
 To update the code your lambda function runs:

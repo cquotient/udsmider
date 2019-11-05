@@ -96,7 +96,7 @@ function _cleanup(err, rc, cb) {
 
 function _handler(event, context, callback) {
   let rc = BB.promisifyAll(redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST));
-  console.log(`debouncing with: ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`)
+  console.log(`debouncing with: ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`);
   if(event.Records && event.Records[0] && event.Records[0].Sns) {
     let sns_obj = event.Records[0].Sns;
     console.log(`handling sns: ${JSON.stringify(sns_obj)}`);
