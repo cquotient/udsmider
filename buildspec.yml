@@ -4,6 +4,10 @@ phases:
   pre_build:
     commands:
       - echo Entered the pre_build phase...
+      - service docker start
+      - sleep 15
+      - service docker status
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
       - docker run -d -p 6379:6379 --name redis redis:5.0.0-alpine
       - npm install
   build:
